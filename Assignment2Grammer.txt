@@ -1,0 +1,21 @@
+prog -> stmt.
+stmt -> IF expr THEN stmt ELSE stmt
+     | WHILE expr DO stmt
+     | INPUT ID
+     | ID ASSIGN expr
+     | WRITE expr
+     | BEGIN stmtlist END.
+stmtlist -> stmtlist stmt SEMICOLON
+     |.
+expr -> expr addop term
+     | term.
+addop -> ADD
+     | SUB.
+term -> term mulop factor
+     | factor.
+mulop -> MUL
+     | DIV.
+factor -> LPAR expr RPAR
+     | ID 
+     | NUM
+     | SUB NUM.
