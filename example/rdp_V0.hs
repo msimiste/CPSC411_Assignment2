@@ -140,6 +140,7 @@ stmtlist' ts = Right ts
 
 semipart :: [Lexeme] -> Either String [Lexeme] 
 semipart ((SEMICOLON n):ts) = stmtlist' ts
+semipart ts = errors ts "semipart"
 
 expr :: [Lexeme] -> Either String [Lexeme]
 --expr ts = expr' (term ts)
@@ -158,17 +159,21 @@ expr' ((SUB n):ts) = do
                        val1 <- term ts
                        expr' val1
 --expr' ts = expr' (term ts)
+--Should this go to errors ie, expr' ts = errors ts "espr'"
 expr' ts = Right ts
 
 thenpart :: [Lexeme] -> Either String [Lexeme]
 thenpart ((THEN n):ts) = stmt ts
 
+
 elsepart :: [Lexeme] -> Either String [Lexeme]
 elsepart ((ELSE m):ts) = stmt ts
 
 
+
 dopart :: [Lexeme] -> Either String [Lexeme]
 dopart ((DO n):ts) = stmt ts
+
 
 
 endpart ::[Lexeme] -> Either String [Lexeme]
@@ -201,6 +206,7 @@ factor ((LPAR n):ts) = do
 factor ((ID m n):ts) = Right ts
 factor ((NUM _ m):ts) = Right ts
 factor ((SUB n):(NUM o p):ts) = Right ts
+factor ts = errors ts "factor"
 
 
 
@@ -252,5 +258,6 @@ main = do
       let parse = stmt ts
       case parse of 
          Right [] -> putStrLn "Parsing Successful" 
-         Left str -> do putStrLn str
+         Left str -> do putStrLn str 
+    Left tsp -> do putStrLn tsp
 

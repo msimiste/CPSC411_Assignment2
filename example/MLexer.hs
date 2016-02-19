@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-unused-binds -fno-warn-missing-signatures #-}
 {-# LANGUAGE CPP #-}
 {-# LINE 1 "MLexer.x" #-}
 
@@ -17,48 +16,18 @@ import System.Environment
 #endif
 #if __GLASGOW_HASKELL__ >= 503
 import Data.Array
+import Data.Char (ord)
 import Data.Array.Base (unsafeAt)
 #else
 import Array
+import Char (ord)
 #endif
-{-# LINE 1 "templates/wrappers.hs" #-}
-{-# LINE 1 "templates/wrappers.hs" #-}
+{-# LINE 1 "templates\wrappers.hs" #-}
+{-# LINE 1 "templates\\wrappers.hs" #-}
 {-# LINE 1 "<built-in>" #-}
 {-# LINE 1 "<command-line>" #-}
 {-# LINE 9 "<command-line>" #-}
-# 1 "/usr/include/stdc-predef.h" 1 3 4
-
-# 17 "/usr/include/stdc-predef.h" 3 4
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{-# LINE 1 "G:\\GitHub\\haskell-platform\\build\\ghc-bindist\\local\\lib/include\\ghcversion.h" #-}
 
 
 
@@ -77,41 +46,17 @@ import Array
 
 
 {-# LINE 9 "<command-line>" #-}
-{-# LINE 1 "/usr/local/ghc-7.10.2/lib/ghc-7.10.2/include/ghcversion.h" #-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{-# LINE 9 "<command-line>" #-}
-{-# LINE 1 "templates/wrappers.hs" #-}
+{-# LINE 1 "templates\\wrappers.hs" #-}
 -- -----------------------------------------------------------------------------
 -- Alex wrapper code.
 --
 -- This code is in the PUBLIC DOMAIN; you may copy it freely and use
 -- it for any purpose whatsoever.
 
-
-import Control.Applicative as App (Applicative (..))
-import qualified Control.Monad (ap)
-
-
+import Control.Applicative (Applicative (..))
 import Data.Word (Word8)
-{-# LINE 28 "templates/wrappers.hs" #-}
+{-# LINE 23 "templates\\wrappers.hs" #-}
 
-import Data.Char (ord)
 import qualified Data.Bits
 
 -- | Encode a Haskell String to a list of Word8 values, in UTF8 format.
@@ -162,11 +107,11 @@ alexGetByte (p,_,[],(c:s))  = let p' = alexMove p c
                               in p' `seq`  Just (b, (p', c, bs, s))
 
 
-{-# LINE 101 "templates/wrappers.hs" #-}
+{-# LINE 93 "templates\\wrappers.hs" #-}
 
-{-# LINE 119 "templates/wrappers.hs" #-}
+{-# LINE 107 "templates\\wrappers.hs" #-}
 
-{-# LINE 137 "templates/wrappers.hs" #-}
+{-# LINE 122 "templates\\wrappers.hs" #-}
 
 -- -----------------------------------------------------------------------------
 -- Token positions
@@ -186,7 +131,7 @@ alexStartPos :: AlexPosn
 alexStartPos = AlexPn 0 1 1
 
 alexMove :: AlexPosn -> Char -> AlexPosn
-alexMove (AlexPn a l c) '\t' = AlexPn (a+1)  l     (((c+alex_tab_size-1) `div` alex_tab_size)*alex_tab_size+1)
+alexMove (AlexPn a l c) '\t' = AlexPn (a+1)  l     (((c+7) `div` 8)*8+1)
 alexMove (AlexPn a l c) '\n' = AlexPn (a+1) (l+1)   1
 alexMove (AlexPn a l c) _    = AlexPn (a+1)  l     (c+1)
 
@@ -239,7 +184,7 @@ instance Monad Alex where
   m >>= k  = Alex $ \s -> case unAlex m s of 
                                 Left msg -> Left msg
                                 Right (s',a) -> unAlex (k a) s'
-  return = App.pure
+  return a = Alex $ \s -> Right (s,a)
 
 alexGetInput :: Alex AlexInput
 alexGetInput
@@ -306,21 +251,21 @@ token t input len = return (t input len)
 -- -----------------------------------------------------------------------------
 -- Monad (with ByteString input)
 
-{-# LINE 374 "templates/wrappers.hs" #-}
+{-# LINE 347 "templates\\wrappers.hs" #-}
 
 
 -- -----------------------------------------------------------------------------
 -- Basic wrapper
 
-{-# LINE 401 "templates/wrappers.hs" #-}
+{-# LINE 374 "templates\\wrappers.hs" #-}
 
 
 -- -----------------------------------------------------------------------------
 -- Basic wrapper, ByteString version
 
-{-# LINE 421 "templates/wrappers.hs" #-}
+{-# LINE 392 "templates\\wrappers.hs" #-}
 
-{-# LINE 437 "templates/wrappers.hs" #-}
+{-# LINE 406 "templates\\wrappers.hs" #-}
 
 
 -- -----------------------------------------------------------------------------
@@ -328,13 +273,13 @@ token t input len = return (t input len)
 
 -- Adds text positions to the basic model.
 
-{-# LINE 454 "templates/wrappers.hs" #-}
+{-# LINE 423 "templates\\wrappers.hs" #-}
 
 
 -- -----------------------------------------------------------------------------
 -- Posn wrapper, ByteString version
 
-{-# LINE 470 "templates/wrappers.hs" #-}
+{-# LINE 438 "templates\\wrappers.hs" #-}
 
 
 -- -----------------------------------------------------------------------------
@@ -342,8 +287,6 @@ token t input len = return (t input len)
 
 -- For compatibility with previous versions of Alex, and because we can.
 
-alex_tab_size :: Int
-alex_tab_size = 8
 alex_base :: Array Int Int
 alex_base = listArray (0,57) [-8,-55,-76,0,37,0,165,293,549,485,0,731,-2,0,709,954,1046,1138,1230,1322,1414,1506,1598,-36,1690,1782,1874,1966,2058,2150,2242,2334,2426,2518,2610,2702,2794,2886,2978,3070,3162,3254,3346,3438,3530,3622,3714,3806,0,0,0,0,-20,0,0,0,0,3898]
 
@@ -598,44 +541,12 @@ alex_action_19 =  rpar
 alex_action_20 =  semicolon 
 alex_action_21 =  nested_comment 
 alex_action_22 =  word 
-{-# LINE 1 "templates/GenericTemplate.hs" #-}
-{-# LINE 1 "templates/GenericTemplate.hs" #-}
+{-# LINE 1 "templates\GenericTemplate.hs" #-}
+{-# LINE 1 "templates\\GenericTemplate.hs" #-}
 {-# LINE 1 "<built-in>" #-}
 {-# LINE 1 "<command-line>" #-}
 {-# LINE 8 "<command-line>" #-}
-# 1 "/usr/include/stdc-predef.h" 1 3 4
-
-# 17 "/usr/include/stdc-predef.h" 3 4
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{-# LINE 1 "G:\\GitHub\\haskell-platform\\build\\ghc-bindist\\local\\lib/include\\ghcversion.h" #-}
 
 
 
@@ -654,26 +565,7 @@ alex_action_22 =  word
 
 
 {-# LINE 8 "<command-line>" #-}
-{-# LINE 1 "/usr/local/ghc-7.10.2/lib/ghc-7.10.2/include/ghcversion.h" #-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{-# LINE 8 "<command-line>" #-}
-{-# LINE 1 "templates/GenericTemplate.hs" #-}
+{-# LINE 1 "templates\\GenericTemplate.hs" #-}
 -- -----------------------------------------------------------------------------
 -- ALEX TEMPLATE
 --
@@ -683,19 +575,19 @@ alex_action_22 =  word
 -- -----------------------------------------------------------------------------
 -- INTERNALS and main scanner engine
 
-{-# LINE 21 "templates/GenericTemplate.hs" #-}
+{-# LINE 21 "templates\\GenericTemplate.hs" #-}
 
-{-# LINE 51 "templates/GenericTemplate.hs" #-}
+{-# LINE 51 "templates\\GenericTemplate.hs" #-}
 
-{-# LINE 72 "templates/GenericTemplate.hs" #-}
+{-# LINE 72 "templates\\GenericTemplate.hs" #-}
 alexIndexInt16OffAddr arr off = arr ! off
 
 
-{-# LINE 93 "templates/GenericTemplate.hs" #-}
+{-# LINE 93 "templates\\GenericTemplate.hs" #-}
 alexIndexInt32OffAddr arr off = arr ! off
 
 
-{-# LINE 105 "templates/GenericTemplate.hs" #-}
+{-# LINE 105 "templates\\GenericTemplate.hs" #-}
 quickIndex arr i = arr ! i
 
 
@@ -714,30 +606,30 @@ alexScan input (sc)
 
 alexScanUser user input (sc)
   = case alex_scan_tkn user input (0) input sc AlexNone of
-        (AlexNone, input') ->
-                case alexGetByte input of
-                        Nothing -> 
+	(AlexNone, input') ->
+		case alexGetByte input of
+			Nothing -> 
 
 
 
-                                   AlexEOF
-                        Just _ ->
+				   AlexEOF
+			Just _ ->
 
 
 
-                                   AlexError input'
+				   AlexError input'
 
-        (AlexLastSkip input'' len, _) ->
-
-
-
-                AlexSkip input'' len
-
-        (AlexLastAcc k input''' len, _) ->
+	(AlexLastSkip input'' len, _) ->
 
 
 
-                AlexToken input''' len k
+		AlexSkip input'' len
+
+	(AlexLastAcc k input''' len, _) ->
+
+
+
+		AlexToken input''' len k
 
 
 -- Push the input through the DFA, remembering the most recent accepting
@@ -746,7 +638,7 @@ alexScanUser user input (sc)
 alex_scan_tkn user orig_input len input s last_acc =
   input `seq` -- strict in the input
   let 
-        new_acc = (check_accs (alex_accept `quickIndex` (s)))
+	new_acc = (check_accs (alex_accept `quickIndex` (s)))
   in
   new_acc `seq`
   case alexGetByte input of
@@ -760,34 +652,34 @@ alex_scan_tkn user orig_input len input s last_acc =
                 base   = alexIndexInt32OffAddr alex_base s
                 offset = (base + ord_c)
                 check  = alexIndexInt16OffAddr alex_check offset
-                
+		
                 new_s = if (offset >= (0)) && (check == ord_c)
-                          then alexIndexInt16OffAddr alex_table offset
-                          else alexIndexInt16OffAddr alex_deflt s
-        in
+			  then alexIndexInt16OffAddr alex_table offset
+			  else alexIndexInt16OffAddr alex_deflt s
+	in
         case new_s of
-            (-1) -> (new_acc, input)
-                -- on an error, we want to keep the input *before* the
-                -- character that failed, not after.
-            _ -> alex_scan_tkn user orig_input (if c < 0x80 || c >= 0xC0 then (len + (1)) else len)
+	    (-1) -> (new_acc, input)
+		-- on an error, we want to keep the input *before* the
+		-- character that failed, not after.
+    	    _ -> alex_scan_tkn user orig_input (if c < 0x80 || c >= 0xC0 then (len + (1)) else len)
                                                 -- note that the length is increased ONLY if this is the 1st byte in a char encoding)
-                        new_input new_s new_acc
+			new_input new_s new_acc
       }
   where
-        check_accs (AlexAccNone) = last_acc
-        check_accs (AlexAcc a  ) = AlexLastAcc a input (len)
-        check_accs (AlexAccSkip) = AlexLastSkip  input (len)
+	check_accs (AlexAccNone) = last_acc
+	check_accs (AlexAcc a  ) = AlexLastAcc a input (len)
+	check_accs (AlexAccSkip) = AlexLastSkip  input (len)
 
-        check_accs (AlexAccPred a predx rest)
-           | predx user orig_input (len) input
-           = AlexLastAcc a input (len)
-           | otherwise
-           = check_accs rest
-        check_accs (AlexAccSkipPred predx rest)
-           | predx user orig_input (len) input
-           = AlexLastSkip input (len)
-           | otherwise
-           = check_accs rest
+	check_accs (AlexAccPred a predx rest)
+	   | predx user orig_input (len) input
+	   = AlexLastAcc a input (len)
+	   | otherwise
+	   = check_accs rest
+	check_accs (AlexAccSkipPred predx rest)
+	   | predx user orig_input (len) input
+	   = AlexLastSkip input (len)
+	   | otherwise
+	   = check_accs rest
 
 
 data AlexLastAcc a
@@ -796,9 +688,9 @@ data AlexLastAcc a
   | AlexLastSkip  !AlexInput !Int
 
 instance Functor AlexLastAcc where
-    fmap _ AlexNone = AlexNone
+    fmap f AlexNone = AlexNone
     fmap f (AlexLastAcc x y z) = AlexLastAcc (f x) y z
-    fmap _ (AlexLastSkip x y) = AlexLastSkip x y
+    fmap f (AlexLastSkip x y) = AlexLastSkip x y
 
 data AlexAcc a user
   = AlexAccNone
@@ -827,8 +719,12 @@ alexPrevCharIsOneOf arr _ input _ _ = arr ! alexInputPrevChar input
 --alexRightContext :: Int -> AlexAccPred _
 alexRightContext (sc) user _ _ input = 
      case alex_scan_tkn user input (0) input sc AlexNone of
-          (AlexNone, _) -> False
-          _ -> True
-        -- TODO: there's no need to find the longest
-        -- match when checking the right context, just
-        -- the first match will do.
+	  (AlexNone, _) -> False
+	  _ -> True
+	-- TODO: there's no need to find the longest
+	-- match when checking the right context, just
+	-- the first match will do.
+
+
+-- used by wrappers
+iUnbox (i) = i
