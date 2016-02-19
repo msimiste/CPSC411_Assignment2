@@ -18,4 +18,4 @@ mulop -> MUL
 factor -> LPAR expr RPAR
      | ID 
      | NUM
-     | SUB NUM.
+     | SUB NUM.a

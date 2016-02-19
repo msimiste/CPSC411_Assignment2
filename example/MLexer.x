@@ -98,15 +98,15 @@ data Lexeme = ID String AlexPosn
              | BEGIN AlexPosn
              | END AlexPosn
              | WRITE AlexPosn
-             | ASSIGN String AlexPosn
-             | ADD Char AlexPosn             
-             | SUB Char AlexPosn
-             | MUL Char AlexPosn
-             | DIV Char AlexPosn
+             | ASSIGN AlexPosn
+             | ADD AlexPosn             
+             | SUB AlexPosn
+             | MUL AlexPosn
+             | DIV AlexPosn
              | NUM Int AlexPosn
-             | LPAR Char AlexPosn
-             | RPAR Char AlexPosn
-             | SEMICOLON Char AlexPosn
+             | LPAR AlexPosn
+             | RPAR AlexPosn
+             | SEMICOLON AlexPosn
              | LEOF  
   deriving (Show,Eq)
 
@@ -141,31 +141,31 @@ write :: AlexInput -> int -> Alex Lexeme
 write (posn,c,_,inp) len =  return $ WRITE posn
 
 assign :: AlexInput -> Int -> Alex Lexeme
-assign (posn,c,_,inp) len =  return $ ASSIGN (take len inp) posn
+assign (posn,c,_,inp) len =  return $ ASSIGN posn
 
 add :: AlexInput -> Int -> Alex Lexeme
-add (posn,c,_,inp) len =  return $ ADD (head (take len inp)) posn
+add (posn,c,_,inp) len =  return $ ADD  posn
 
 num :: AlexInput -> Int -> Alex Lexeme
 num (posn,c,_,inp) len =  return $ NUM (read (take len inp)) posn
 
 semicolon :: AlexInput -> Int -> Alex Lexeme
-semicolon (posn,c,_,inp) len =  return $ SEMICOLON (head (take len inp)) posn
+semicolon (posn,c,_,inp) len =  return $ SEMICOLON  posn
 
 sub :: AlexInput -> Int -> Alex Lexeme
-sub (posn,c,_,inp) len =  return $ SUB (head(take len inp)) posn
+sub (posn,c,_,inp) len =  return $ SUB posn
 
 mul :: AlexInput -> Int -> Alex Lexeme
-mul (posn,c,_,inp) len =  return $ MUL (head(take len inp)) posn
+mul (posn,c,_,inp) len =  return $ MUL posn
 
 div' :: AlexInput -> Int -> Alex Lexeme
-div' (posn,c,_,inp) len =  return $ DIV (head(take len inp)) posn
+div' (posn,c,_,inp) len =  return $ DIV posn
 
 lpar :: AlexInput -> Int -> Alex Lexeme
-lpar (posn,c,_,inp) len =  return $ LPAR (head(take len inp)) posn
+lpar (posn,c,_,inp) len =  return $ LPAR posn
 
 rpar :: AlexInput -> Int -> Alex Lexeme
-rpar (posn,c,_,inp) len =  return $ RPAR (head(take len inp)) posn
+rpar (posn,c,_,inp) len =  return $ RPAR posn
 
 alexEOF = return LEOF
 
@@ -232,8 +232,8 @@ lexError s = do
          then " before " ++ show (head input)
          else " at end of file"))
  
-{-
-main = do 
+
+test = do 
     args <- getArgs
     case length args == 0 of
         True  -> do 
@@ -249,7 +249,7 @@ main = do
                    putStrLn "The List of tokens are as follows.\n"
                    mapM_ (putStrLn.show) tok 
                Left msg -> do  
-                  putStrLn msg   -} 
+                  putStrLn msg  
                    
 
 
@@ -259,12 +259,11 @@ mlex :: IO (Either String [Lexeme])
 mlex = do
   putStrLn "Enter the input"
   s <- getLine
-  abc <- readIO (tokens s)
-  return abc
+  --putStrLn "\n**************************************\n"
+  abc <-return (tokens s)
+  --putStrLn ("Brian does not believe!!!" ++ (show abc))
   
- 
- 
-  
- 
+  return abc 
+  --
 }
 
