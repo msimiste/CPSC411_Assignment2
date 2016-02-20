@@ -2,6 +2,22 @@ module Main  where
 import MLexer
 import Data.Either
 
+                                
+data Stmt = If Exp Stmt Stmt                        -
+			| While Exp Stmt 
+			| Assign String Exp
+			| Block[Stmt]
+			| Write Exp
+			| Input Exp
+			deriving (Eq, Show, Read)
+			
+data Exp = Add Exp Exp   
+		   | Mul Exp Exp
+		   | Div Exp Exp 
+		   | Sub Exp
+		   | Id String
+		   | Num Int
+		   deriving (Eq, Show, Read)
 {-     
 Grammar                            Haskell Code
 =======                            ============
@@ -81,8 +97,11 @@ rightbrac -> RPAR.
      | ID ASSIGN expr
      | WRITE expr
      | BEGIN stmtlist endpart.-}
+     
+prog :: [Lexeme] -> Either String [Lexeme]
+prog ts = stmt ts
 
-stmt :: [Lexeme] -> Either String [Lexeme]
+stmt :: [Lexeme] -> Either String ([Lexeme], Stmt)
 --stmt ((IF n):ts) = elsepart(thenpart (expr ts)) 
 stmt ((IF n):ts) = do
                     val1 <- expr ts
@@ -94,7 +113,9 @@ stmt ((WHILE n):ts) = do
                       dopart val1
                        
 stmt ((INPUT i):(ID m n):ts) = Right ts
-stmt ((ID m n):(ASSIGN p):ts) = expr ts
+stmt ((ID m n):(ASSIGN p):ts) = do
+                                (L, E) <- expr ts
+                                Right(L, Assign m E)
 stmt ((WRITE m):ts) = expr ts
 
 --stmt ((BEGIN m):ts) = endpart(stmtlist ts)
@@ -142,25 +163,26 @@ semipart :: [Lexeme] -> Either String [Lexeme]
 semipart ((SEMICOLON n):ts) = stmtlist' ts
 semipart ts = errors ts "semipart"
 
-expr :: [Lexeme] -> Either String [Lexeme]
+expr ::  [Lexeme] -> Either String ([Lexeme], Exp)
 --expr ts = expr' (term ts)
 expr ts = do 
-          val1 <- term ts
-          expr' val1
+          (L, E) <- term ts
+           expr' E L
           
-expr' :: [Lexeme] -> Either String [Lexeme]
+          
+expr' :: Exp -> [Lexeme] -> Either String ([Lexeme], Exp)
 --expr' ((ADD m n):ts) = expr' (term ts)
-expr' ((ADD n):ts) = do 
-                       val1 <- term ts
+expr' e ((ADD n):ts) = do 
+                       (L, E) <- term ts
                        expr' val1
                        
 --expr' ((SUB m n):ts) = expr' (term ts)
-expr' ((SUB n):ts) = do 
+expr' e ((SUB n):ts) = do 
                        val1 <- term ts
                        expr' val1
 --expr' ts = expr' (term ts)
 --Should this go to errors ie, expr' ts = errors ts "espr'"
-expr' ts = Right ts
+expr' ts = Right (ts, e)
 
 thenpart :: [Lexeme] -> Either String [Lexeme]
 thenpart ((THEN n):ts) = stmt ts
@@ -180,39 +202,42 @@ endpart ::[Lexeme] -> Either String [Lexeme]
 endpart ((END m):ts) = Right ts
 endpart ts = errors ts "endpart"
 
-term :: [Lexeme] -> Either String [Lexeme]
+term :: [Lexeme] -> Either String ([Lexeme], Exp)
 --term ts = term'(factor ts)
 term ts = do 
-          val1 <- factor ts
-          term' val1
-term' :: [Lexeme] -> Either String [Lexeme]
+          (L, E) <- factor ts
+          term' E L
+          
+term' :: Exp -> [Lexeme] -> Either String ([Lexeme], Exp)
 --term' ((MUL m n):ts) = term' (factor ts)
-term' ((MUL n):ts) = do 
-                       val1 <- factor ts
-                       term' val1
+term' e ((MUL n):ts) = do 
+                       (L, E) <- factor ts
+                       (L1, E1) <- term' E L
+                       Right (L1, Mul e E1)
 --term' ((DIV m n):ts) = term' (factor ts)
-term' ((DIV n):ts) = do 
-                       val1 <- factor ts
-                       term' val1
+term' e ((DIV n):ts) = do 
+                       (L, E) <- factor ts
+                       (L1, E1) <- term' E L
+                       Right (L1, Div e E1)
                        
 --term' ts = term'(factor ts)
-term' ts = Right ts
+term' e ts = Right (ts, e)
           
-factor :: [Lexeme] -> Either String [Lexeme]
+factor :: [Lexeme] -> Either String ([Lexeme], Exp)
 --factor ((LPAR m n):ts) = rightbrac (expr ts)
 factor ((LPAR n):ts) = do
                        val1 <- expr ts
                        rightbrac val1                         
-factor ((ID m n):ts) = Right ts
-factor ((NUM _ m):ts) = Right ts
-factor ((SUB n):(NUM o p):ts) = Right ts
+factor ((ID m pos):ts) = Right (ts, Id m)
+factor ((NUM m pos):ts) = Right (ts,Num m)
+factor ((SUB n):(NUM o pos):ts) = Right (ts, Sub n)
 factor ts = errors ts "factor"
 
 
 
 
-rightbrac :: [Lexeme] -> Either String [Lexeme]
-rightbrac ((RPAR n):ts) = Right ts
+rightbrac :: [Lexeme] -> Either String ([Lexeme], Exp)
+rightbrac ((RPAR n):ts) = Right (ts, e)
 
 
 errors :: [Lexeme]-> String -> Either String [Lexeme]
@@ -255,7 +280,7 @@ main = do
   l <- mlex
   case l of
     Right ts -> do
-      let parse = stmt ts
+      let parse = prog ts
       case parse of 
          Right [] -> putStrLn "Parsing Successful" 
          Left str -> do putStrLn str 

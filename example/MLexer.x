@@ -46,9 +46,9 @@ $alpha[$alpha$digit]*        				{ word }
 
 -- the line below will only be used if special chars are allowed to be included in ID values
 
-$alpha[$other$alpha$digit]*              	{ word } 
+--$alpha[$other$alpha$digit]*              	{ word } 
 
-{
+{en
 
 
 
