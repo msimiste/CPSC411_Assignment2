@@ -277,9 +277,12 @@ errors1 toks y = Left $ "Error: " ++ y ++" : Couldn't parse\n" ++ show toks
 
 instance (Out a) => Out (Stmt a) where                       
 		
-  doc (If a b c) =  parens $ text "If" $$ nest 1 (doc a) $$ nest 2 (doc b) $$ nest 3 (doc c) 
+  doc (If a b c) =  parens $ text "If" $$ nest 1 (doc a)
+                                                     $$ nest 1(doc b) 
+                                                     $$ nest 1(doc c) 
   doc (While a b) = parens $ text "While" $$ nest 1 (doc a) $$ nest 2 (doc b)
-  doc (Assign a b) = parens $ text "Assign" $$ nest 1 (doc a) $$ nest 2 (doc b)
+  doc (Assign a b) = parens $ text "Assign" $$ nest 1 (doc a) 
+                                                           $$ nest 2 (doc b)
   doc (Block a ) = parens $ text "Block" $$ nest 1 (doc a)
   doc (Write a ) = parens $ text "Write" $$ nest 1 (doc a)
   doc (Input a ) = parens $ text "Input" $$ nest 1 (doc a)
@@ -290,7 +293,7 @@ instance (Out a) => Out (Stmt a) where
 
 instance (Out a) => Out (Exp a) where                       
 	
-	doc (Add a b) =  parens $ text "Add" $$ nest 1 (doc a) $$ nest 2 (doc b)
+	doc (Add a b) =  parens $ text "Add" $$ nest (doc a) (doc b)
 	doc (Mul a b) = parens $ text "Mul" $$ nest 1 (doc a) $$ nest 2 (doc b)
 	doc (Div a b) = parens $ text "Div" $$ nest 1 (doc a) $$ nest 2 (doc b)
 	doc (Sub a ) = parens $ text "Sub" $$ nest 1 (doc a)
@@ -298,38 +301,13 @@ instance (Out a) => Out (Exp a) where
 	doc (Num a ) = parens $ text "Num" $$ nest 1 (doc a)
 
 	docPrec _ = doc
+    
+stackStmt :: Int -> Stmt String -> (Int, String)
+stackStmt n (If e s1 s2) = ((show e)++"cJump L"++(show n)++"\n"++code1++"JUMP L"++(show(n+1))++"\n"
+                                      ++"L"++(show n)++"\n"++code2++"L"++(show(n+1)++":\n", m)) where
+                                      (code1, n') = stackStmt(n+2) s1
+                                      (code2, m) = stackStmt n' s2
 
-
-{-
-more_exp ::[Lexeme] -> Either String [Lexeme]
-more_exp (ADD:ts) = more_exp (term ts)
-more_exp ts = ts
-
-term :: [Lexeme] -> Either String [Lexeme]
-term ts = more_term (factor ts)
-
-more_term :: [Lexeme] -> Either String [Lexeme]
-more_term (MUL:ts) = more_term (factor ts)
-more_term ts = ts
-
-factor :: [Lexeme] -> Either String [Lexeme]
-factor ((NUM n):ts) = ts
--}
-
-
-{-main = do
-  l <- mlex
-  case l of 
-    Right ts -> do
-      let parse      = stmt ts
-      let succParse  = if null parse then True else False
-      if succParse then do
-        putStrLn  "Parsing Successful"
-      else do
-        putStrLn "Parsing Failed"
-    Left tsp -> do
-     putStrLn  tsp 
--}
 
 main = do
   l <- mlex
@@ -337,10 +315,13 @@ main = do
     Right ts -> do
       let parse = prog ts
       case parse of 
-         Right ([], ast) -> do 
-			putStrLn "Parsing Successful"
-			putStrLn $ "AST is :\n" ++ show ast
-			pp ast 
+         Right ([], ast) -> do
+             putStrLn "Parsing Successful"
+             putStrLn $ "AST is :\n" ++ show ast
+             pp ast
+             let(count, output) = stackStmt 1 ast
+             putStrLn(output)++" count: "++count++"\n"
+                        
          Left str -> do putStrLn str 
     Left tsp -> do putStrLn tsp
 
