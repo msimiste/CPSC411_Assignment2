@@ -48,7 +48,7 @@ $alpha[$alpha$digit]*        				{ word }
 
 --$alpha[$other$alpha$digit]*              	{ word } 
 
-{en
+{
 
 
 
