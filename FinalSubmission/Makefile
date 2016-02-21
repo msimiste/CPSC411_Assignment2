@@ -8,7 +8,7 @@ CC=ghc
 all: first second 
 
 
-second: assign1.hs
+second: A2Recognizer.hs
 	ghc --make A2Recognizer.hs
 		
 first: A2Lexer.x
