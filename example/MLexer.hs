@@ -486,27 +486,26 @@ lexError s = do
          then " before " ++ show (head input)
          else " at end of file"))
  
-{-
-test = do 
+mlex :: IO (Either String [Lexeme])
+mlex = do 
     args <- getArgs
     case length args == 0 of
         True  -> do 
-               let usage = "\nExpecting of the form < ./eng_lang inputfile > got < ./eng_lang >.\n\nTry again. :(\n"
-               error $ "\n****************Error: Expecting file name as an argument." ++ usage
+             putStrLn "Enter the Input Filename"
+             s <- getLine
+             contents <- readFile s
+             abc <- return  (tokens contents)
+             return abc
         False -> do
             let fname  = args !! 0 
             conts <- readFile fname
-            let etok = tokens conts 
-            case etok of
-               Right tok -> do
-                   putStrLn "\n**************************************\n"
-                   putStrLn "The List of tokens are as follows.\n"
-                   mapM_ (putStrLn.show) tok 
-               Left msg -> do  
-                  putStrLn msg -} 
+            etok <- return (tokens conts)
+            return etok
+                 
+           
                    
 
-
+{-
 mlex :: IO (Either String [Lexeme])
 mlex = do
   putStrLn "Enter the Input Filename"
@@ -523,7 +522,7 @@ mlex = do
   --putStrLn ("Brian does not believe!!!" ++ (show abc))
   
   return abc 
-  -}
+  -}-}
 
 alex_action_0 =  skip 
 alex_action_2 =  if' 

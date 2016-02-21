@@ -1,4 +1,4 @@
-READ x
+READ y
 rPush x
 cJump L3
 rPush x
@@ -13,5 +13,9 @@ OP1 -
 OP2 +
 LOAD x
 L4:
+rPush y
 rPush x
+OP2 +
+LOAD z
+rPush z
 PRINT
