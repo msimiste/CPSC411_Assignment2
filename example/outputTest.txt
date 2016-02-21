@@ -1,6 +1,17 @@
-cPush 9
+READ x
+rPush x
+cJump L3
+rPush x
+cPush 6
+OP2 +
 LOAD x
-cPush 8
-LOAD y
-cPush 98
-LOAD j
+JUMP L4
+L3:
+rPush x
+cPush 6
+OP1 -
+OP2 +
+LOAD x
+L4:
+rPush x
+PRINT

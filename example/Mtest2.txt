@@ -1,0 +1,9 @@
+ 
+begin
+
+    input y;
+   if x then x:= x+6 else x:= x-6;
+    z:= y * x;
+    write z;
+
+end

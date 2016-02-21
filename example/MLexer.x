@@ -233,7 +233,7 @@ lexError s = do
          then " before " ++ show (head input)
          else " at end of file"))
  
-
+{-
 test = do 
     args <- getArgs
     case length args == 0 of
@@ -250,7 +250,7 @@ test = do
                    putStrLn "The List of tokens are as follows.\n"
                    mapM_ (putStrLn.show) tok 
                Left msg -> do  
-                  putStrLn msg  
+                  putStrLn msg -} 
                    
 
 

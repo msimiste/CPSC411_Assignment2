@@ -22,21 +22,6 @@ data Exp a = Add (Exp a)  (Exp a)
 		   | Num Int
 		   deriving (Eq, Show, Read)
 {-     
-Grammar                            Haskell Code
-=======                            ============
-exp -> term more_exp               exp ts = more_exp (term ts)
-
-more_exp -> + term more_exp        more_exp (ADD:ts) = more_exp (term ts)
-          |.                       more_exp ts = ts
-
-term -> factor more_term           term ts = more_term (factor ts)
-
-more_term -> * factor more_term    more_term (MUL:ts) = more_term (factor ts)
-           |.                      more_term ts = ts
-
-factor -> NUM.                     factor ((NUM n):ts) = 
-
-
 prog -> stmt.
 stmt -> IF expr thenpart elsepart
      | WHILE expr dopart
@@ -44,9 +29,6 @@ stmt -> IF expr thenpart elsepart
      | ID ASSIGN expr
      | WRITE expr
      | BEGIN stmtlist endpart.
-   
-
-
      
 stmtlist -> stmtlist'.
 stmtlist' -> IF expr thenpart elsepart semipart 
@@ -85,7 +67,7 @@ factor -> LPAR expr rightbrac
      |    SUB NUM.
 
 rightbrac -> RPAR.
-how to create gitignore
+
 
 
 
@@ -225,7 +207,7 @@ dopart ((DO n):ts) =  stmt ts
 endpart ::[Lexeme] -> Either String [Lexeme]
 endpart ((END m):ts) = Right ts
 endpart ts = Left $ "Error: " ++ "endpart" ++" : Couldn't parse\n" ++ show ts
-                              ++ "\nExp Stringecting a number got " ++ show (head ts) 
+                              ++ "\nExpecting a number got " ++ show (head ts) 
 
 
 term :: [Lexeme] -> Either String ([Lexeme], Exp String)
@@ -325,12 +307,28 @@ stackExp :: Exp String -> String
 stackExp (Add e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
 stackExp (Mul e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
 stackExp (Div e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
-stackExp (Sub e1) = (stackExp e1)++"OP1 +"++"\n"
+stackExp (Sub e1) = (stackExp e1)++"OP1 -"++"\n"
 stackExp (Id s) = ("rPush "++ s ++"\n")
 stackExp (Num s) = ("cPush "++ (show s) ++"\n")
 
 
 main = do
+    args <- getArgs
+    case length args == 0 of
+        True  -> do 
+               let usage = "\nExpecting of the form < ./eng_lang inputfile > got < ./eng_lang >.\n\nTry again. :(\n"
+               error $ "\n****************Error: Expecting file name as an argument." ++ usage
+        False -> do
+            let fname  = args !! 0 
+            conts <- readFile fname
+            let etok = tokens conts 
+            case etok of
+               Right tok -> do
+                   putStrLn "\n**************************************\n"
+                   putStrLn "The List of tokens are as follows.\n"
+                   mapM_ (putStrLn.show) tok 
+               Left msg -> do  
+                  putStrLn msg -} 
   l <- mlex
   case l of
     Right ts -> do
