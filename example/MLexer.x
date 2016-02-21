@@ -4,6 +4,7 @@ module MLexer where
 
 import Data.Char (chr)
 import System.Environment
+import System.IO
 
 
 }
@@ -253,9 +254,14 @@ test = do
                    
 
 
-
-
 mlex :: IO (Either String [Lexeme])
+mlex = do
+  putStrLn "Enter the Input Filename"
+  s <- getLine
+  contents <- readFile s
+  abc <- return  (tokens contents)
+  return abc
+{-mlex :: IO (Either String [Lexeme])
 mlex = do
   putStrLn "Enter the input"
   s <- getLine
@@ -264,6 +270,6 @@ mlex = do
   --putStrLn ("Brian does not believe!!!" ++ (show abc))
   
   return abc 
-  --
+  -}
 }
 

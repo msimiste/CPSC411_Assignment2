@@ -289,8 +289,6 @@ instance (Out a) => Out (Stmt a) where
   doc (Input a ) = parens $ text "Input" $$ nest 1 (doc a)
   
   docPrec _ = doc
-  
-  
 
 instance (Out a) => Out (Exp a) where                       
 	
@@ -309,28 +307,19 @@ stackStmt n (If e s1 s2) = (m,  (stackExp e) ++"cJump L"++(show n)++"\n"++code1+
                                       (n', code1) = stackStmt(n+2) s1
                                       (m, code2) = stackStmt n' s2
 
-                                      
 stackStmt n (Assign s e) = (n, (stackExp e)++"LOAD "++s++"\n")
-
 stackStmt n (While e s1) = (m, "L"++show(n)++":\n"++(stackExp e)++"cJump L"++(show (n+1))++"\n"++code1++"JUMP L"
                                       ++(show(n))++"\n"++"L"++show(n+1)++":\n") where
                                       (m, code1) = stackStmt (n+1) s1
 
 
-stackStmt n (Block xs) = (n', head g) where
-                         (n', g) = mapAccumL(\x y -> stackStmt (x+1) (Block y)) n [xs]
---stackStmt n (Block []) = (n, "")                                    
---stackStmt n (Block (x:xs))
- -- | length (x:xs) == 1 = stackStmt (n+1) x
- -- | otherwise = stackStmt (n+1) (Block xs)
---stackStmt n (Block (x:xs)) = stackStmt n' x where
---                             (n', y) = stackStmt (n+1) (Block xs)
-                             
+stackStmt n (Block []) = (n, "")
+stackStmt n (Block (x:xs)) = (n2, x1++x2) where
+                             (n1, x1) = stackStmt (n+1) x
+                             (n2, x2) = stackStmt n1 (Block xs)                            
 stackStmt n (Write e) = (n, (stackExp e)++"PRINT\n")
-stackStmt n (Input (Id s)) = (n, "READ "++s++"\n")
-                                         
+stackStmt n (Input (Id s)) = (n, "READ "++s++"\n")                          
 
-                                     
 
 stackExp :: Exp String -> String
 stackExp (Add e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
@@ -352,7 +341,8 @@ main = do
              putStrLn $ "AST is :\n" ++ show ast
              pp ast
              let(count, output) = stackStmt 1 ast             
-             putStrLn output    
+             putStrLn output 
+             writeFile "outputTest.txt" output
          Left str -> do putStrLn str 
     Left tsp -> do putStrLn tsp
 

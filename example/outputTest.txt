@@ -1,0 +1,6 @@
+cPush 9
+LOAD x
+cPush 8
+LOAD y
+cPush 98
+LOAD j
