@@ -3,7 +3,7 @@
 
 CC=ghc
 
-.SILENT
+.SILENT:
 
 all: first second 
 
@@ -15,6 +15,6 @@ first: A2Lexer.x
 	alex A2Lexer.x
 	
 clean: 
-	@rm -f *.hs *.exe *.hi *.o
+	@rm -f A2Lexer.hs *.exe *.hi *.o
 	
 
