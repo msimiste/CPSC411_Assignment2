@@ -1,6 +1,7 @@
 module Main  where
 import MLexer
 import Data.Either
+import Data.List
 import Text.PrettyPrint
 import Text.PrettyPrint.GenericPretty
 
@@ -84,7 +85,7 @@ factor -> LPAR expr rightbrac
      |    SUB NUM.
 
 rightbrac -> RPAR.
-
+how to create gitignore
 
 
 
@@ -145,37 +146,37 @@ stmtlist' s ((IF n):ts) = do
                         (l1, s1) <- thenpart l
                         (l2, s2) <- elsepart l1
                         (l3, s3)  <- semipart l2 s
-                        Right (l3, [If e s1 s2]++s)
+                        Right (l3, [If e s1 s2]++s3)
                          
 --stmtlist' ((WHILE n):ts) = semipart(dopart ts)
 stmtlist' s ((WHILE n):ts) = do
                            (l, e) <- expr ts
                            (l1, s1) <- dopart l
                            (l2, s2) <- semipart l1 s
-                           Right (l2, [While e s1]++s)
+                           Right (l2, [While e s1]++s2)
                            
 stmtlist' s ((INPUT i):(ID m n):ts) = do
 									(l, s1) <- semipart ts s
-									Right (l, [Input (Id m)]++s)
+									Right (l, [Input (Id m)]++s1)
 	 
                                     
 --stmtlist' ((ID m n):(ASSIGN o p):ts) = semipart(expr ts)
 stmtlist' s ((ID m n):(ASSIGN p):ts) = do
                                        (l, e) <- expr ts
                                        (l1, s1) <- semipart l s
-                                       Right (l1, [Assign m e]++s)
+                                       Right (l1, [Assign m e]++s1)
 --stmtlist' ((WRITE m):ts) =  semipart(expr ts)
 stmtlist' s ((WRITE m):ts) = do
                            (l, e) <- expr ts
                            (l1, s1) <- semipart l s
-                           Right (l1, [Write e]++s)
+                           Right (l1, [Write e]++s1)
                            
 --stmtlist' ((BEGIN m):ts) = semipart(endpart(stmtlist ts))
 stmtlist' s ((BEGIN m):ts) = do
                            (l, s1) <- stmtlist ts
                            l1 <- endpart l
                            (l2, s2) <- semipart l1 s1
-                           Right (l2, [Block s1]++s)
+                           Right (l2, [Block s1]++s2)
                            
 stmtlist' s ts = Right (ts, s)
 
@@ -293,7 +294,7 @@ instance (Out a) => Out (Stmt a) where
 
 instance (Out a) => Out (Exp a) where                       
 	
-	doc (Add a b) =  parens $ text "Add" $$ nest (doc a) (doc b)
+	doc (Add a b) =  parens $ text "Add" $$ nest 1 (doc a) $$ nest 2 (doc b)
 	doc (Mul a b) = parens $ text "Mul" $$ nest 1 (doc a) $$ nest 2 (doc b)
 	doc (Div a b) = parens $ text "Div" $$ nest 1 (doc a) $$ nest 2 (doc b)
 	doc (Sub a ) = parens $ text "Sub" $$ nest 1 (doc a)
@@ -303,10 +304,41 @@ instance (Out a) => Out (Exp a) where
 	docPrec _ = doc
     
 stackStmt :: Int -> Stmt String -> (Int, String)
-stackStmt n (If e s1 s2) = ((show e)++"cJump L"++(show n)++"\n"++code1++"JUMP L"++(show(n+1))++"\n"
-                                      ++"L"++(show n)++"\n"++code2++"L"++(show(n+1)++":\n", m)) where
-                                      (code1, n') = stackStmt(n+2) s1
-                                      (code2, m) = stackStmt n' s2
+stackStmt n (If e s1 s2) = (m,  (stackExp e) ++"cJump L"++(show n)++"\n"++code1++"JUMP L"++(show(n+1))++"\n"
+                                      ++"L"++(show n)++":\n"++code2++"L"++(show(n+1)++":\n")) where
+                                      (n', code1) = stackStmt(n+2) s1
+                                      (m, code2) = stackStmt n' s2
+
+                                      
+stackStmt n (Assign s e) = (n, (stackExp e)++"LOAD "++s++"\n")
+
+stackStmt n (While e s1) = (m, "L"++show(n)++":\n"++(stackExp e)++"cJump L"++(show (n+1))++"\n"++code1++"JUMP L"
+                                      ++(show(n))++"\n"++"L"++show(n+1)++":\n") where
+                                      (m, code1) = stackStmt (n+1) s1
+
+
+stackStmt n (Block xs) = (n', head g) where
+                         (n', g) = mapAccumL(\x y -> stackStmt (x+1) (Block y)) n [xs]
+--stackStmt n (Block []) = (n, "")                                    
+--stackStmt n (Block (x:xs))
+ -- | length (x:xs) == 1 = stackStmt (n+1) x
+ -- | otherwise = stackStmt (n+1) (Block xs)
+--stackStmt n (Block (x:xs)) = stackStmt n' x where
+--                             (n', y) = stackStmt (n+1) (Block xs)
+                             
+stackStmt n (Write e) = (n, (stackExp e)++"PRINT\n")
+stackStmt n (Input (Id s)) = (n, "READ "++s++"\n")
+                                         
+
+                                     
+
+stackExp :: Exp String -> String
+stackExp (Add e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
+stackExp (Mul e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
+stackExp (Div e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
+stackExp (Sub e1) = (stackExp e1)++"OP1 +"++"\n"
+stackExp (Id s) = ("rPush "++ s ++"\n")
+stackExp (Num s) = ("cPush "++ (show s) ++"\n")
 
 
 main = do
@@ -319,9 +351,8 @@ main = do
              putStrLn "Parsing Successful"
              putStrLn $ "AST is :\n" ++ show ast
              pp ast
-             let(count, output) = stackStmt 1 ast
-             putStrLn(output)++" count: "++count++"\n"
-                        
+             let(count, output) = stackStmt 1 ast             
+             putStrLn output    
          Left str -> do putStrLn str 
     Left tsp -> do putStrLn tsp
 
