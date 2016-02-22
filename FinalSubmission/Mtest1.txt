@@ -1,8 +1,23 @@
- 
+/*Test 1 - Testing for the basics, ie tests each operation once, technically is testing comments as well*/ 
 begin
 
+
+   write x;
+   write 4;
+   input x;
+    
     y:= 23;
     x:= 13 + y;
     write x;
+    z:= x*y;
+    t:= z-y;
+    
+     if t then input x else input y;
+    s:= t+z;
+    while j do
+    x:= x+1;
+    j:=s+t;
+   
+   
 
 end

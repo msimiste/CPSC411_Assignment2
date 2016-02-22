@@ -1,0 +1,16 @@
+rPush x
+cJump L1
+rPush y
+cJump L3
+cPush 5
+LOAD x
+JUMP L4
+L3:
+cPush 6
+LOAD b
+L4:
+JUMP L2
+L1:
+cPush 77
+LOAD c
+L2:

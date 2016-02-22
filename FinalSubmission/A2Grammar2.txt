@@ -1,0 +1,42 @@
+prog -> stmt.
+stmt -> IF expr thenpart elsepart.
+     | WHILE expr dopart.
+     | INPUT ID.
+     | ID ASSIGN expr.
+     | WRITE expr.
+     | BEGIN stmtlist endpart.
+     
+stmtlist -> stmtlist'.
+stmtlist' -> IF expr thenpart elsepart semipart 
+     | WHILE expr dopart semipart 
+     | INPUT ID semipart 
+     | ID ASSIGN expr semipart 
+     | WRITE expr semipart 
+     | BEGIN stmtlist endpart semipart 
+     |.
+     
+thenpart -> THEN stmt.
+elsepart -> ELSE stmt.
+dopart ->   DO stmt.
+endpart -> END.
+
+semipart -> SEMICOLON stmtlist'.
+
+expr  ->  term expr'.
+
+expr' -> ADD term expr'.
+     | SUB term expr'.  
+     |.
+     
+term  ->  factor term'.
+
+term' -> MUL factor term'.
+     | DIV factor term'.    
+     |.
+     
+factor -> LPAR expr rightbrac.
+     |    ID. 
+     |    NUM.
+     |    SUB NUM.
+
+rightbrac -> RPAR.

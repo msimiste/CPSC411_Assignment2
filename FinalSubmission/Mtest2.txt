@@ -1,9 +1,9 @@
- 
+ /* This will test nested if statements */
 begin
 
-    input y;
-   if x then x:= x+6 else x:= x-6;
-    z:= y * x;
-    write z;
+  
+   
+   if x then if y then x:= 5 else b:= 6 else c:= 77;
+  
 
 end

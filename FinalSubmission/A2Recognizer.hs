@@ -8,22 +8,23 @@ import Text.PrettyPrint.GenericPretty
 
                                 
 data Stmt a = If (Exp a) (Stmt a) (Stmt a)                        
-			| While (Exp a) (Stmt a) 
-			| Assign String (Exp a)
-			| Block [Stmt a]
-			| Write (Exp a)
-			| Input (Exp a)
-			deriving (Eq, Show, Read)
-			
+            | While (Exp a) (Stmt a) 
+            | Assign String (Exp a)
+            | Block [Stmt a]
+            | Write (Exp a)
+            | Input (Exp a)
+            deriving (Eq, Show, Read)
+            
 data Exp a = Add (Exp a)  (Exp a)   
-		   | Mul (Exp a) (Exp a)
-		   | Div (Exp a) (Exp a)
-		   | Sub (Exp a)
-		   | Id String
-		   | Num Int
-		   deriving (Eq, Show, Read)
+           | Mul (Exp a) (Exp a)
+           | Div (Exp a) (Exp a)
+           | Sub (Exp a)
+           | Id String
+           | Num Int
+           deriving (Eq, Show, Read)
 
-     
+
+--Coded Version of Assign2 Grammar--           
 prog :: [Lexeme] -> Either String ([Lexeme], Stmt String)
 prog ts = stmt ts
 
@@ -44,8 +45,8 @@ stmt ((ID m n):(ASSIGN p):ts) = do
                                 (l, e) <- expr ts
                                 Right(l, Assign m e)
 stmt ((WRITE m):ts) = do
-					(l, e) <- expr ts
-					Right(l, Write e)
+                    (l, e) <- expr ts
+                    Right(l, Write e)
 
 stmt ((BEGIN m):ts) =  do
                        (l, s) <- stmtlist ts
@@ -57,8 +58,8 @@ stmt ts = errors1 ts "stmt"
 
 stmtlist :: [Lexeme] -> Either String ([Lexeme], [Stmt String])
 stmtlist ts = do
-				(l, s) <- stmtlist' [] ts
-				Right (l, s)
+                (l, s) <- stmtlist' [] ts
+                Right (l, s)
 
 stmtlist' :: [Stmt String] ->[Lexeme] -> Either String ([Lexeme], [Stmt String])
 stmtlist' s ((IF n):ts) = do
@@ -75,9 +76,9 @@ stmtlist' s ((WHILE n):ts) = do
                            Right (l2, [While e s1]++s2)
                            
 stmtlist' s ((INPUT i):(ID m n):ts) = do
-									(l, s1) <- semipart ts s
-									Right (l, [Input (Id m)]++s1)
-	 
+                                    (l, s1) <- semipart ts s
+                                    Right (l, [Input (Id m)]++s1)
+     
 stmtlist' s ((ID m n):(ASSIGN p):ts) = do
                                        (l, e) <- expr ts
                                        (l1, s1) <- semipart l s
@@ -131,7 +132,7 @@ dopart ((DO n):ts) =  stmt ts
 endpart ::[Lexeme] -> Either String [Lexeme]
 endpart ((END m):ts) = Right ts
 endpart ts = Left $ "Error: " ++ "endpart" ++" : Couldn't parse\n" ++ show ts
-                              ++ "\nExpecting a number got " ++ show (head ts) 
+                              ++ "\nExpecting [] got " ++ show (head ts) 
 
 
 term :: [Lexeme] -> Either String ([Lexeme], Exp String)
@@ -160,24 +161,27 @@ factor ((ID m pos):ts) = Right (ts, Id m)
 factor ((NUM m pos):ts) = Right (ts, Num m)
 factor ((SUB n):(NUM o pos):ts) = Right (ts, Sub (Num o))
 factor ts = Left $ "Error: " ++ "factor" ++" : Couldn't parse\n" ++ show ts
-                              ++ "\nExp Stringecting a number got " ++ show (head ts) 
+                              ++ "\nExpecting ID, NUM or SUB got " ++ show (head ts) 
 
 rightbrac :: [Lexeme] -> Either String [Lexeme]
 rightbrac ((RPAR n):ts) = Right ts
 
 errors :: [Lexeme]-> String -> Either String ([Lexeme], [Stmt String])
 errors toks y = Left $ "Error: " ++ y ++" : Couldn't parse\n" ++ show toks
-                              ++ "\nExp Stringecting a number got " ++ show (head toks) 
+                              ++ "\nExpecting a semicolon got " ++ show (head toks) 
                               
 errors1 :: [Lexeme]-> String -> Either String ([Lexeme], Stmt String)
 errors1 toks y = Left $ "Error: " ++ y ++" : Couldn't parse\n" ++ show toks
-                              ++ "\nExp Stringecting a number got " ++ show (head toks) 
+                              ++ "\nExpecting a number got " ++ show (head toks) 
 
+                              
+
+--used for pretty printing--
 instance (Out a) => Out (Stmt a) where                       
-		
+        
   doc (If a b c) =  parens $ text "If" $$ nest 1 (doc a)
-                                                     $$ nest 1(doc b) 
-                                                     $$ nest 1(doc c) 
+                                                     $$ nest 2(doc b) 
+                                                     $$ nest 3(doc c) 
   doc (While a b) = parens $ text "While" $$ nest 1 (doc a) $$ nest 2 (doc b)
   doc (Assign a b) = parens $ text "Assign" $$ nest 1 (doc a) 
                                                            $$ nest 2 (doc b)
@@ -187,17 +191,21 @@ instance (Out a) => Out (Stmt a) where
   
   docPrec _ = doc
 
+  
+--used for pretty printing--
 instance (Out a) => Out (Exp a) where                       
-	
-	doc (Add a b) =  parens $ text "Add" $$ nest 1 (doc a) $$ nest 2 (doc b)
-	doc (Mul a b) = parens $ text "Mul" $$ nest 1 (doc a) $$ nest 2 (doc b)
-	doc (Div a b) = parens $ text "Div" $$ nest 1 (doc a) $$ nest 2 (doc b)
-	doc (Sub a ) = parens $ text "Sub" $$ nest 1 (doc a)
-	doc (Id a ) = parens $ text "Id" $$ nest 1 (doc a)
-	doc (Num a ) = parens $ text "Num" $$ nest 1 (doc a)
-
-	docPrec _ = doc
     
+    doc (Add a b) =  parens $ text "Add" $$ nest 1 (doc a) $$ nest 2 (doc b)
+    doc (Mul a b) = parens $ text "Mul" $$ nest 1 (doc a) $$ nest 2 (doc b)
+    doc (Div a b) = parens $ text "Div" $$ nest 1 (doc a) $$ nest 2 (doc b)
+    doc (Sub a ) = parens $ text "Sub" $$ nest 1 (doc a)
+    doc (Id a ) = parens $ text "Id" $$ nest 1 (doc a)
+    doc (Num a ) = parens $ text "Num" $$ nest 1 (doc a)
+
+    docPrec _ = doc
+ 
+
+--code for generating stack code-- 
 stackStmt :: Int -> Stmt String -> (Int, String)
 stackStmt n (If e s1 s2) = (m,  (stackExp e) ++"cJump L"++(show n)++"\n"++code1++"JUMP L"++(show(n+1))++"\n"
                                       ++"L"++(show n)++":\n"++code2++"L"++(show(n+1)++":\n")) where
@@ -220,13 +228,15 @@ stackStmt n (Input (Id s)) = (n, "READ "++s++"\n")
 
 stackExp :: Exp String -> String
 stackExp (Add e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
-stackExp (Mul e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
-stackExp (Div e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
+stackExp (Mul e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 *"++"\n"
+stackExp (Div e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 `div`"++"\n"
 stackExp (Sub e1) = (stackExp e1)++"OP1 -"++"\n"
 stackExp (Id s) = ("rPush "++ s ++"\n")
 stackExp (Num s) = ("cPush "++ (show s) ++"\n")
 
 
+
+--handles file I/0 and recieves the tokens from the lexer---
 main = do
   args <- getArgs   
   l <- mlex
@@ -238,7 +248,7 @@ main = do
              putStrLn "Parsing Successful"
              putStrLn $ "AST is :\n" ++ show ast
              pp ast
-             let(count, output) = stackStmt 1 ast             
+             let(count, output) = stackStmt 0 ast             
              case length args <= 1 of 
                 True -> writeFile "outputDefault.txt" output
                 False -> writeFile (args !! 1) output

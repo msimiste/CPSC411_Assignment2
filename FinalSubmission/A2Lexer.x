@@ -18,32 +18,32 @@ $other = [\!\@\#\$\^\&\'\"\<\>\.\,\?\-\|\/\_\:]
 
 tokens :-
 
-$white+                     				{ skip }
-"%".*$newLine                  					;
-if                           				{ if' }
-then                         				{ then' }
-while                        				{ while }
-do                           				{ do' }
-input                        				{ input }
-else                         				{ else' }
-begin                        				{ begin' }
-end                          				{ end }
-write                        				{ write }
-$digit+                      				{ num } 
-$alpha[$alpha$digit]*        				{ word }
-":="                         				{ assign }
-"+"                          				{ add }
-"-"                          				{ sub }
-"*"                          				{ mul }
-"/"                          				{ div' }
-"("                          				{ lpar }
-")"                          				{ rpar }
-";"                          				{ semicolon }
-"/*"                         				{ nested_comment }
+$white+                                     { skip }
+"%".*$newLine                                      ;
+if                                           { if' }
+then                                         { then' }
+while                                        { while }
+do                                           { do' }
+input                                        { input }
+else                                         { else' }
+begin                                        { begin' }
+end                                          { end }
+write                                        { write }
+$digit+                                      { num } 
+$alpha[$alpha$digit]*                        { word }
+":="                                         { assign }
+"+"                                          { add }
+"-"                                          { sub }
+"*"                                          { mul }
+"/"                                          { div' }
+"("                                          { lpar }
+")"                                          { rpar }
+";"                                          { semicolon }
+"/*"                                         { nested_comment }
 
 -- the line below will only be used if special chars are allowed to be included in ID values
 
---$alpha[$other$alpha$digit]*              	{ word } 
+--$alpha[$other$alpha$digit]*                  { word } 
 
 {
 
@@ -228,7 +228,8 @@ lexError s = do
        (if (not (null input))
          then " before " ++ show (head input)
          else " at end of file"))
- 
+
+--either uses provided filename or prompts user for input file--         
 mlex :: IO (Either String [Lexeme])
 mlex = do 
     args <- getArgs

@@ -1,15 +1,12 @@
- 
-/* This program calculates the
-    factorial of the number which
-    is input  */
+/* to test nested begin/end statements */
 
 begin
-    input x;                    % input a number .. 
-    y:= 1;
-    while x do
+    input x;                    % input a number ..    
         begin
           y:= y * x;
-          x:= x - 1;
+          begin
+            if x then b:=6 else h:= 99;
+          end;
         end;
      write y;
 end 
