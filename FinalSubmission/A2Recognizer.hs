@@ -93,7 +93,7 @@ stmtlist' s ((BEGIN m):ts) = do
                            (l, s1) <- stmtlist ts
                            l1 <- endpart l
                            (l2, s2) <- semipart l1 s1
-                           Right (l2, [Block s1]++s2)
+                           Right (l2, [Block s2])
                            
 stmtlist' s ts = Right (ts, s)
 
@@ -177,7 +177,7 @@ rightbrack ts = Left $ "\nError: " ++ "rightbrac" ++" : Couldn't parse\n\n" ++ s
  
 
 
---had originally thought to have generic type error handling-- 
+--had originally thought to have generic type error handling--v 
 errors :: [Lexeme]-> String -> Either String ([Lexeme], Stmt String)
 errors toks y = Left $ "\nError: " ++ y ++" : Couldn't parse\n\n" ++ show toks
                               ++ "\n\nExpecting a STMT type got " ++ show (head toks)                               
