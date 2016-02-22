@@ -1,12 +1,9 @@
 /* to test nested begin/end statements */
 
-begin
-    input x;                    % input a number ..    
-        begin
-          y:= y * x;
-          begin
-            if x then b:=6 else h:= 99;
-          end;
-        end;
-     write y;
-end 
+begin       
+    begin
+      begin
+        this:=  that;
+      end;
+    end; 
+end

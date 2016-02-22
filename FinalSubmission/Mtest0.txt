@@ -1,0 +1,12 @@
+/* Shows Error Handling */
+begin 
+    if x then 
+        while x:= 9 do  % error message will be in regards to the assign comming before the do,
+                        % which is informative to the user
+            y:= y+5
+    else if x then 
+        while c do
+        if v then g:= 78 else g:= 90; %error message points out semicolon, and the fact 
+                                      % that an additional else is required
+    else a:= 56;    
+end

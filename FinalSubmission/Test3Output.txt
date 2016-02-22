@@ -1,47 +1,8 @@
-READ x
-rPush y
-rPush x
-OP2 +
-LOAD y
-rPush x
-cJump L5
-cPush 6
-LOAD b
-JUMP L6
-L5:
-cPush 99
-LOAD h
-L6:
-rPush x
-cJump L8
-cPush 6
-LOAD b
-JUMP L9
-L8:
-cPush 99
-LOAD h
-L9:
-rPush y
-PRINT
-rPush y
-rPush x
-OP2 +
-LOAD y
-rPush x
-cJump L14
-cPush 6
-LOAD b
-JUMP L15
-L14:
-cPush 99
-LOAD h
-L15:
-rPush x
-cJump L17
-cPush 6
-LOAD b
-JUMP L18
-L17:
-cPush 99
-LOAD h
-L18:
+rPush that
+LOAD this
+rPush that
+LOAD this
+rPush that
+LOAD this
+rPush that
+LOAD this

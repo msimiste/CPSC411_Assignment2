@@ -1,13 +1,5 @@
-%  Not every program compiles ....
+/* to make if statement fail */
 begin 
-   input x;
-   /*  this is I know a silly comment but by now 
-       you should have your comments right % */
-       or else you may be having a problem
-   /*  by the way this is also a comment */
-       and this is still a comment ...
-       but I think I will finish my comments now! */
-      % now you should complain!!!
-     if x then x:= x+6 else x:= x-6;
-   write x;
+
+    if x then x:= 9; else x:= 10; % should fail because of semicolon in thenpart
 end

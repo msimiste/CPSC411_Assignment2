@@ -1,0 +1,46 @@
+rPush x
+PRINT
+cPush 4
+PRINT
+READ x
+cPush 23
+LOAD y
+cPush 13
+rPush y
+OP2 +
+LOAD x
+rPush x
+PRINT
+rPush x
+rPush y
+OP2 *
+LOAD z
+rPush z
+rPush y
+OP1 -
+OP2 +
+LOAD t
+rPush t
+cJump L9
+READ x
+JUMP L10
+L9:
+READ y
+L10:
+rPush t
+rPush z
+OP2 +
+LOAD s
+L13:
+rPush j
+cJump L14
+rPush x
+cPush 1
+OP2 +
+LOAD x
+JUMP L13
+L14:
+rPush s
+rPush t
+OP2 +
+LOAD j

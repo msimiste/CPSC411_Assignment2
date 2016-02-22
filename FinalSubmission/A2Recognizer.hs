@@ -53,7 +53,7 @@ stmt ((BEGIN m):ts) =  do
                        l1 <- endpart l
                        Right (l1, Block s)
                        
-stmt ts = errors1 ts "stmt"
+stmt ts = errors ts "stmt"
 
 
 stmtlist :: [Lexeme] -> Either String ([Lexeme], [Stmt String])
@@ -99,7 +99,8 @@ stmtlist' s ts = Right (ts, s)
 
 semipart :: [Lexeme] -> [Stmt String] -> Either String ([Lexeme], [Stmt String])
 semipart ((SEMICOLON n):ts) s  = stmtlist' s ts
-semipart ts s  = errors ts "semipart"
+semipart ts s  = Left $ "\nError: semipart : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting a SEMICOLON got " ++ show (head ts)
 
 expr ::  [Lexeme] -> Either String ([Lexeme], Exp String)
 expr ts = do
@@ -122,17 +123,23 @@ expr' e ts = Right (ts, e)
 
 thenpart :: [Lexeme] -> Either String ([Lexeme], Stmt String)
 thenpart ((THEN n):ts) =  stmt ts
+thenpart ts = Left $ "\nError: " ++ "thenpart" ++" : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting THEN got " ++ show (head ts)
 
 elsepart :: [Lexeme] -> Either String ([Lexeme], Stmt String)
 elsepart ((ELSE m):ts) = stmt ts
+elsepart ts = Left $ "\nError: " ++ "elsepart" ++" : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting ELSE got " ++ show (head ts)
 
 dopart :: [Lexeme] -> Either String ([Lexeme], Stmt String)
 dopart ((DO n):ts) =  stmt ts
+dopart ts = Left $ "\nError: " ++ "dopart" ++" : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting DO got " ++ show (head ts)
 
 endpart ::[Lexeme] -> Either String [Lexeme]
 endpart ((END m):ts) = Right ts
-endpart ts = Left $ "Error: " ++ "endpart" ++" : Couldn't parse\n" ++ show ts
-                              ++ "\nExpecting [] got " ++ show (head ts) 
+endpart ts = Left $ "\nError: " ++ "endpart" ++" : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting END got " ++ show (head ts) 
 
 
 term :: [Lexeme] -> Either String ([Lexeme], Exp String)
@@ -160,21 +167,20 @@ factor ((LPAR n):ts) = do
 factor ((ID m pos):ts) = Right (ts, Id m)
 factor ((NUM m pos):ts) = Right (ts, Num m)
 factor ((SUB n):(NUM o pos):ts) = Right (ts, Sub (Num o))
-factor ts = Left $ "Error: " ++ "factor" ++" : Couldn't parse\n" ++ show ts
-                              ++ "\nExpecting ID, NUM or SUB got " ++ show (head ts) 
+factor ts = Left $ "\nError: " ++ "factor" ++" : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting ID, NUM or SUB got " ++ show (head ts) 
 
 rightbrac :: [Lexeme] -> Either String [Lexeme]
 rightbrac ((RPAR n):ts) = Right ts
+rightbrack ts = Left $ "\nError: " ++ "rightbrac" ++" : Couldn't parse\n\n" ++ show ts
+                              ++ "\n\nExpecting RPAR got " ++ show (head ts)
+ 
 
-errors :: [Lexeme]-> String -> Either String ([Lexeme], [Stmt String])
-errors toks y = Left $ "Error: " ++ y ++" : Couldn't parse\n" ++ show toks
-                              ++ "\nExpecting a semicolon got " ++ show (head toks) 
-                              
-errors1 :: [Lexeme]-> String -> Either String ([Lexeme], Stmt String)
-errors1 toks y = Left $ "Error: " ++ y ++" : Couldn't parse\n" ++ show toks
-                              ++ "\nExpecting a number got " ++ show (head toks) 
 
-                              
+--had originally thought to have generic type error handling-- 
+errors :: [Lexeme]-> String -> Either String ([Lexeme], Stmt String)
+errors toks y = Left $ "\nError: " ++ y ++" : Couldn't parse\n\n" ++ show toks
+                              ++ "\n\nExpecting a STMT type got " ++ show (head toks)                               
 
 --used for pretty printing--
 instance (Out a) => Out (Stmt a) where                       
@@ -229,7 +235,7 @@ stackStmt n (Input (Id s)) = (n, "READ "++s++"\n")
 stackExp :: Exp String -> String
 stackExp (Add e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 +"++"\n"
 stackExp (Mul e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 *"++"\n"
-stackExp (Div e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 `div`"++"\n"
+stackExp (Div e1 e2) = (stackExp e1) ++ (stackExp e2) ++"OP2 /"++"\n"
 stackExp (Sub e1) = (stackExp e1)++"OP1 -"++"\n"
 stackExp (Id s) = ("rPush "++ s ++"\n")
 stackExp (Num s) = ("cPush "++ (show s) ++"\n")

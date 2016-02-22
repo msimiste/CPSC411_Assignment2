@@ -1,11 +1,11 @@
-/* A single missed character can be fatal ....  */
-begin
-  input x; input y;
-  while x-y do 
-       begin
-         z:= x;
-         x:= x-y;
-         y = x;
-       end;
- write y;
+/* Nested If's and While's  */
+begin 
+    if x then 
+        while x:= 9; do
+            y:= y+5
+    else if x then 
+        while c:= 8 do
+        if v then g:= 78 else g:= 90;
+    else a:= 56;
+    
 end
